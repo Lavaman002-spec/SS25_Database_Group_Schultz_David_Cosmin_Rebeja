@@ -1,0 +1,29 @@
+services:
+  db:
+    image: mariadb:latest
+    container_name: vacation-db
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpass
+    ports:
+      - '3306:3306'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'mariadb-admin',
+          'ping',
+          '-h',
+          'localhost',
+          '-uroot',
+          '-prootpass',
+        ]
+      interval: 5s
+      retries: 10
+      start_period: 10s
+
+  init-db:
+    build: ./init
+    command: python3 setup_db.py
+    depends_on:
+      db:
+        condition: service_healthy
